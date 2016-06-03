@@ -1,0 +1,170 @@
+-- annule toutes les tâches de mises à jour
+UPDATE ir_cron set active = false;
+
+-- mets admin et philmer comme techniciens
+INSERT INTO res_groups_users_rel ( uid, gid) 
+    SELECT ru.id, rg.id FROM res_users as ru,
+                             res_groups as rg
+                        WHERE ru.login in ('admin','vandermeer') and rg.name = 'Technical Features';
+
+-- indique tous les utilisateurs comme étant dans le fuseau horaire belge
+UPDATE res_users SET context_tz = 'Euorpe/Brussels' WHERE login not in ('public','portaltemplate');
+
+-- efface les codes pages jaunes
+
+-- Efface les catégories correspondant aux segmentations A1 -> D4 de CM et la moulinette qui les recalule
+DELETE FROM res_partner_res_partner_category_rel
+       WHERE category_id in (SELECT id FROM res_partner_category
+                                       WHERE parent_id in (SELECT id FROM res_partner_category
+                                                                     WHERE name = 'Segmentation Type de Client'));
+DELETE FROM res_partner_category
+       WHERE parent_id in (SELECT id FROM res_partner_category
+                                     WHERE name = 'Segmentation Type de Client');
+DELETE FROM res_partner_res_partner_category_rel
+       WHERE category_id in (SELECT id FROM res_partner_category
+                                       WHERE name = 'Segmentation Type de Client');
+DELETE FROM res_partner_category
+       WHERE name = 'Segmentation Type de Client';
+
+-- Efface la catégorie 'Client' et ses trois sous-catégories
+DELETE FROM res_partner_res_partner_category_rel
+       WHERE category_id in (SELECT id FROM res_partner_category
+                                       WHERE parent_id in (SELECT id FROM res_partner_category
+                                                                     WHERE name = 'Customer'));
+DELETE FROM res_partner_category
+       WHERE parent_id in (SELECT id FROM res_partner_category
+                                     WHERE name = 'Customer');
+DELETE FROM res_partner_res_partner_category_rel
+       WHERE category_id in (SELECT id FROM res_partner_category
+                                       WHERE name = 'Customer');
+DELETE FROM res_partner_category
+       WHERE name = 'Customer';
+
+-- Efface la tâche recalculant le type de client
+DELETE FROM ir_cron where function = 'calculate_type_customer';
+
+-- Efface les codes Pages Jaunes
+DELETE FROM res_partner_activity_relation where activity_id in (SELECT id from res_partner_activity where list_id in (SELECT id FROM res_partner_activity_list WHERE name = 'Pages Jaunes') OR code ilike 'J%');
+DELETE FROM res_partner_activity where list_id in (SELECT id FROM res_partner_activity_list WHERE name = 'Pages Jaunes') OR code ilike 'J%';
+DELETE FROM res_partner_activity_list WHERE name = 'Pages Jaunes';
+
+-- Efface certaines données des fiches RES_PARTNER finales
+ALTER TABLE res_partner DROP COLUMN state_id2;
+ALTER TABLE res_partner DROP COLUMN export_procent;
+ALTER TABLE res_partner DROP COLUMN export_year;
+ALTER TABLE res_partner DROP COLUMN import_procent;
+ALTER TABLE res_partner DROP COLUMN import_year;
+ALTER TABLE res_partner DROP COLUMN employee_nbr;
+ALTER TABLE res_partner DROP COLUMN can_check_formation;
+ALTER TABLE res_partner DROP COLUMN international_company;
+ALTER TABLE res_partner DROP COLUMN formation_priority;
+ALTER TABLE res_partner DROP COLUMN formation_invest;
+ALTER TABLE res_partner DROP COLUMN equal_representation;
+ALTER TABLE res_partner DROP COLUMN employee_slice;
+ALTER TABLE res_partner DROP COLUMN zoning;
+ALTER TABLE res_partner DROP COLUMN personal_statut;
+ALTER TABLE res_partner DROP COLUMN main_direction;
+ALTER TABLE res_partner DROP COLUMN type_direction;
+ALTER TABLE res_partner DROP COLUMN type_purchase;
+ALTER TABLE res_partner DROP COLUMN year_purchase;
+ALTER TABLE res_partner DROP COLUMN from_purchase;
+ALTER TABLE res_partner DROP COLUMN shareholder_count;
+ALTER TABLE res_partner DROP COLUMN share_invest;
+ALTER TABLE res_partner DROP COLUMN share_investor;
+ALTER TABLE res_partner DROP COLUMN share_crowdfund;
+ALTER TABLE res_partner DROP COLUMN share_family;
+ALTER TABLE res_partner DROP COLUMN executive_committee;
+ALTER TABLE res_partner DROP COLUMN decision_level;
+ALTER TABLE res_partner DROP COLUMN others_name;
+ALTER TABLE res_partner DROP COLUMN pf_zip_code;
+ALTER TABLE res_partner DROP COLUMN pf_facebook;
+ALTER TABLE res_partner DROP COLUMN pf_linkedin;
+ALTER TABLE res_partner DROP COLUMN pf_twitter;
+ALTER TABLE res_partner DROP COLUMN pf_facebook_freq;
+ALTER TABLE res_partner DROP COLUMN pf_linkedin_freq;
+ALTER TABLE res_partner DROP COLUMN pf_twitter_freq;
+ALTER TABLE res_partner DROP COLUMN pf_smartphone;
+ALTER TABLE res_partner DROP COLUMN pf_smart_info;
+ALTER TABLE res_partner DROP COLUMN pf_tablet;
+ALTER TABLE res_partner DROP COLUMN pf_tablet_press;
+ALTER TABLE res_partner DROP COLUMN pf_app_pro;
+ALTER TABLE res_partner DROP COLUMN pf_invit_mail;
+ALTER TABLE res_partner DROP COLUMN pf_invit_network;
+ALTER TABLE res_partner DROP COLUMN pf_invit_post;
+ALTER TABLE res_partner DROP COLUMN pf_sms;
+ALTER TABLE res_partner DROP COLUMN pf_ecustomer;
+ALTER TABLE res_partner DROP COLUMN pf_pay_creditcard;
+ALTER TABLE res_partner DROP COLUMN pf_care_cci;
+ALTER TABLE res_partner DROP COLUMN pf_use_language;
+ALTER TABLE res_partner DROP COLUMN pf_eleccar;
+ALTER TABLE res_partner DROP COLUMN pf_nighter;
+ALTER TABLE res_partner DROP COLUMN pf_children;
+ALTER TABLE res_partner DROP COLUMN pf_want_invest;
+ALTER TABLE res_partner DROP COLUMN pf_owner;
+ALTER TABLE res_partner DROP COLUMN pf_cluber;
+ALTER TABLE res_partner DROP COLUMN pf_club_cw;
+ALTER TABLE res_partner DROP COLUMN pf_club_cl;
+ALTER TABLE res_partner DROP COLUMN pf_club_bni;
+ALTER TABLE res_partner DROP COLUMN pf_club_apm;
+ALTER TABLE res_partner DROP COLUMN pf_club_gceq;
+ALTER TABLE res_partner DROP COLUMN pf_club_ypowpo;
+ALTER TABLE res_partner DROP COLUMN pf_club_far;
+ALTER TABLE res_partner DROP COLUMN pf_club_fce;
+ALTER TABLE res_partner DROP COLUMN pf_club_new;
+ALTER TABLE res_partner DROP COLUMN pf_club_zoning;
+ALTER TABLE res_partner DROP COLUMN pf_club_golf;
+ALTER TABLE res_partner DROP COLUMN pf_club_sc;
+ALTER TABLE res_partner DROP COLUMN pf_club_other;
+ALTER TABLE res_partner DROP COLUMN pf_club_other_names;
+ALTER TABLE res_partner DROP COLUMN pf_networker;
+ALTER TABLE res_partner DROP COLUMN pf_freq_network;
+ALTER TABLE res_partner DROP COLUMN pf_network_morning;
+ALTER TABLE res_partner DROP COLUMN pf_network_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_network_dinner;
+ALTER TABLE res_partner DROP COLUMN pf_network_night;
+ALTER TABLE res_partner DROP COLUMN pf_conf_8_10;
+ALTER TABLE res_partner DROP COLUMN pf_conf_9_11;
+ALTER TABLE res_partner DROP COLUMN pf_conf_10_12;
+ALTER TABLE res_partner DROP COLUMN pf_conf_12_14;
+ALTER TABLE res_partner DROP COLUMN pf_conf_14_16;
+ALTER TABLE res_partner DROP COLUMN pf_conf_18_20;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_mon_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_mon_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_mon_evening;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_tue_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_tue_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_tue_evening;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_wed_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_wed_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_wed_evening;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_thu_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_thu_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_thu_evening;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_fri_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_fri_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_fri_evening;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_sat_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_sat_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_sat_evening;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_sun_morning;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_sun_lunch;
+ALTER TABLE res_partner DROP COLUMN pf_dispo_sun_evening;
+ALTER TABLE res_partner DROP COLUMN pf_size_25;
+ALTER TABLE res_partner DROP COLUMN pf_size_2550;
+ALTER TABLE res_partner DROP COLUMN pf_size_50100;
+ALTER TABLE res_partner DROP COLUMN pf_size_100;
+ALTER TABLE res_partner DROP COLUMN pf_price_event;
+ALTER TABLE res_partner DROP COLUMN name_official;
+ALTER TABLE res_partner DROP COLUMN name_old;
+ALTER TABLE product_product DROP COLUMN premium_subscription_type_id;DROP TABLE premium_company;
+DROP TABLE premium_contact;
+DROP TABLE premium_subscription_renew;
+DROP TABLE premium_subscription_usage;
+DROP TABLE premium_subscription;
+DROP TABLE premium_subscription_type;
+DELETE from ir_ui_view WHERE name = 'Premium Data Contact';
+DELETE from ir_ui_view WHERE name = 'Premium Data Partner';
+DELETE from ir_ui_view WHERE name = 'Premium Data Address';
+DELETE from ir_ui_view WHERE name = 'res_partner_contact_form_premium3';
+
+
