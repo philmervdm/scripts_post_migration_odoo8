@@ -8,7 +8,7 @@ INSERT INTO res_groups_users_rel ( uid, gid)
                         WHERE ru.login in ('admin','vandermeer') and rg.name = 'Technical Features';
 
 -- indique tous les utilisateurs comme étant dans le fuseau horaire belge
-UPDATE res_users SET context_tz = 'Euorpe/Brussels' WHERE login not in ('public','portaltemplate');
+UPDATE res_users SET context_tz = 'Europe/Brussels' WHERE login not in ('public','portaltemplate');
 
 -- efface les codes pages jaunes
 
