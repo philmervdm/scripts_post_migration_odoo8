@@ -10,8 +10,6 @@ INSERT INTO res_groups_users_rel ( uid, gid)
 -- indique tous les utilisateurs comme étant dans le fuseau horaire belge
 UPDATE res_users SET context_tz = 'Europe/Brussels' WHERE login not in ('public','portaltemplate');
 
--- efface les codes pages jaunes
-
 -- Efface les catégories correspondant aux segmentations A1 -> D4 de CM et la moulinette qui les recalule
 DELETE FROM res_partner_res_partner_category_rel
        WHERE category_id in (SELECT id FROM res_partner_category
@@ -55,6 +53,8 @@ ALTER TABLE res_partner DROP COLUMN export_year;
 ALTER TABLE res_partner DROP COLUMN import_procent;
 ALTER TABLE res_partner DROP COLUMN import_year;
 ALTER TABLE res_partner DROP COLUMN employee_nbr;
+
+-- Efface mes données freemium abandonnées
 ALTER TABLE res_partner DROP COLUMN can_check_formation;
 ALTER TABLE res_partner DROP COLUMN international_company;
 ALTER TABLE res_partner DROP COLUMN formation_priority;
@@ -63,7 +63,7 @@ ALTER TABLE res_partner DROP COLUMN equal_representation;
 ALTER TABLE res_partner DROP COLUMN employee_slice;
 ALTER TABLE res_partner DROP COLUMN zoning;
 ALTER TABLE res_partner DROP COLUMN personal_statut;
-ALTER TABLE res_partner DROP COLUMN main_direction;
+--- ALTER TABLE res_partner DROP COLUMN main_direction;
 ALTER TABLE res_partner DROP COLUMN type_direction;
 ALTER TABLE res_partner DROP COLUMN type_purchase;
 ALTER TABLE res_partner DROP COLUMN year_purchase;
@@ -156,7 +156,8 @@ ALTER TABLE res_partner DROP COLUMN pf_size_100;
 ALTER TABLE res_partner DROP COLUMN pf_price_event;
 ALTER TABLE res_partner DROP COLUMN name_official;
 ALTER TABLE res_partner DROP COLUMN name_old;
-ALTER TABLE product_product DROP COLUMN premium_subscription_type_id;DROP TABLE premium_company;
+ALTER TABLE product_product DROP COLUMN premium_subscription_type_id;
+DROP TABLE premium_company;
 DROP TABLE premium_contact;
 DROP TABLE premium_subscription_renew;
 DROP TABLE premium_subscription_usage;
@@ -167,4 +168,16 @@ DELETE from ir_ui_view WHERE name = 'Premium Data Partner';
 DELETE from ir_ui_view WHERE name = 'Premium Data Address';
 DELETE from ir_ui_view WHERE name = 'res_partner_contact_form_premium3';
 
+-- Copie les job_id vers contact_id car les job_id pointent vers des res_partner mais dans la définition du champ, ils pointent toujours vers des res_partner_job
+UPDATE mailchimp_proxy SET contact_id = job_id where contact_id is null and job_id is not null;
 
+-- Efface les données MailChimp inutiles
+ALTER TABLE res_partner DROP COLUMN leid;
+ALTER TABLE res_partner DROP COLUMN euid;
+ALTER TABLE mailchimp_proxy DROP COLUMN job_id;
+
+-- Efface un menu qui vient on ne sait pas trop bien d'où et ne sert à rien
+DELETE FROM ir_ui_menu WHERE name ilike 'Code postal sans % traform%';
+
+-- Efface une action dont le domain ou le contexte n'est plus correct
+-- DELETE from ir_act_window where name ilike '%Suivi des Dates formation%'; -- this command causes bug at launch - perhaps try to change 'domain' to '[]' in place of deleting
