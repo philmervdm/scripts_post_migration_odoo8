@@ -7,7 +7,7 @@ import csv
 import psycopg2
 import sys
 
-execfile('params.txt')
+execfile('../params.txt')
 
 def lower_wo_accent(name):
     good_name = name.lower().replace (u'é','e').replace (u'è','e').replace (u'â','a').replace (u'ê','e')
@@ -655,8 +655,10 @@ if FIRST_STEP <= 11 and LAST_STEP >= 11:
                         print '--->Erreur'
 if FIRST_STEP <= 12 and LAST_STEP >= 12:
     # we reinject lastname and firstname on contacts
+    print "### RE INJECT LASTNAME and FIRSTNAME ##############################"
     cur.execute("SELECT id, base_contact_partner_id, last_name, first_name, name FROM res_partner_contact WHERE base_contact_partner_id > 0;")
     records = cur.fetchall()
+    count = 0
     for line in records:
         new_values = {}
         new_values['firstname'] = line[3] or ''
@@ -665,7 +667,7 @@ if FIRST_STEP <= 12 and LAST_STEP >= 12:
             try:
                 sock_obj.execute(dbname,uid,admin_passwd, 'res.partner', 'write', [int(line[1]),], new_values)
             except Exception, erreur:
-                print '--->Erreur ' + str(line[1])
+                print '--->Erreur in part I : ' + str(line[1])
                 print erreur
         else:
             new_values = {}
@@ -674,8 +676,11 @@ if FIRST_STEP <= 12 and LAST_STEP >= 12:
                 try:
                     sock_obj.execute(dbname,uid,admin_passwd, 'res.partner', 'write', [int(line[1]),], new_values)
                 except Exception, erreur:
-                    print '--->Erreur ' + str(line[1])
+                    print '--->Erreur in part II : ' + str(line[1])
                     print erreur
+        count += 1
+        if (count % 100) == 0:
+            print count
 #### ENDING
 cur.close()
 conn.close()

@@ -7,7 +7,7 @@ import csv
 import psycopg2
 import sys
 
-execfile('params.txt')
+execfile('../params.txt')
 
 def lower_wo_accent(name):
     good_name = name.lower().replace (u'é','e').replace (u'è','e').replace (u'â','a').replace (u'ê','e')

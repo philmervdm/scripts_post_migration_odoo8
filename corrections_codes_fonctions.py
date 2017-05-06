@@ -7,7 +7,7 @@ import csv
 import psycopg2
 import sys
 
-execfile('params.txt')
+execfile('../params.txt')
 
 url = 'http://%s/xmlrpc' % connect['url']
 sock_obj = xmlrpclib.ServerProxy(url+'/object')
@@ -20,7 +20,7 @@ psql_server = connect['pserver']
 psql_user = connect['puser']
 psql_pw = connect['ppassword']
 
-dbname = 'ccilvn_20160303_v3_work' # to force the database name 
+#dbname = 'ccilvn_201703' # to force the database name 
 
 uid = sock_connect.login(dbname, admin_login, admin_passwd)
 print "UID : " + str(uid)
@@ -28,7 +28,7 @@ print "UID : " + str(uid)
 #conn = psycopg2.connect(database=dbname, user=psql_user, password=psql_pw, host=psql_server)
 #cur = conn.cursor()
 
-partner_ids = sock_obj.execute(dbname,uid,admin_passwd, 'res.partner', 'search', [('function_code_label','ilike','G')] )
+partner_ids = sock_obj.execute(dbname,uid,admin_passwd, 'res.partner', 'search', [('function_code_label','<>',False)] )
 print len(partner_ids)
 
 functions = sock_obj.execute(dbname,uid,admin_passwd, 'res.partner.function', 'search_read', [], ['code'] )

@@ -181,3 +181,8 @@ DELETE FROM ir_ui_menu WHERE name ilike 'Code postal sans % traform%';
 
 -- Efface une action dont le domain ou le contexte n'est plus correct
 -- DELETE from ir_act_window where name ilike '%Suivi des Dates formation%'; -- this command causes bug at launch - perhaps try to change 'domain' to '[]' in place of deleting
+
+-- Effacer tous les numéros de téléphone et/ou fax qui ne contiennent que des ' '. La zone 'mobile' ne semble pas atteinte par cette maladie
+UPDATE res_partner SET phone = NULL where phone = ' ';
+UPDATE res_partner SET fax = NULL where fax = ' ';
+UPDATE res_partner SET function = function_label;

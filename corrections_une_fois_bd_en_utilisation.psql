@@ -1,0 +1,6 @@
+-- ce script est à utiiser sur la base de données une fois toute la migration effectuées et même quelques jours plus tard
+-- elle va nettoyer la base de données des tables et champs effacés du code migré mais qui se trouvent toujours dans les tables migrées
+-- Efface certaines données des fiches RES_PARTNER finales
+ALTER TABLE res_partner DROP COLUMN activ_state_id;
+ALTER TABLE res_partner DROP COLUMN site_membership;
+
